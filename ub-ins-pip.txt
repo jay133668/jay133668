@@ -1,9 +1,0 @@
-
-ubuntu install pip:
-sudo apt -y install ipython		 
-sudo apt -y install ipython3		 
-sudo apt -y install python-pip		
-sudo apt -y install python3-pip
-sudo apt -y install cmake qtcreator ruby
-sudo apt -y install openssh-server
-
