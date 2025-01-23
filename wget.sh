@@ -1,12 +1,12 @@
 
 #下載網頁內所有 .deb 結尾的安裝包
-# wget  -r -l1 -A.deb --np http://10.26.177.137/samba/base-deb/b/ -e robots=off
+# wget  -r -l1 -A.deb --np -P /tmp http://10.26.177.137/samba/base-deb/b/ -e robots=off
 
 #下載網頁內所有 .deb 結尾的安裝包后，再安裝
-# wget  -r -l1 -A.deb --np http://10.26.177.137/samba/base-deb/b/ -e robots=off && dpkg -i *
+# wget  -r -l1 -A.deb --np -P /tmp  http://10.26.177.137/samba/base-deb/b/ -e robots=off && dpkg -i *
 
-#
- # wget  -r -l0 -A.deb --no-parent http://10.26.177.137/samba/ -e robots=off
+#-P 下載到指定目錄
+ # wget  -r -l0 -A.deb --np -P /tmp http://10.26.177.137/samba/ -e robots=off
 
 
  wget_info () {
