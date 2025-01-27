@@ -8,7 +8,6 @@
 #-P 下載到指定目錄
  # wget  -r -l0 -A.deb --np -P /tmp http://10.26.177.137/samba/ -e robots=off
 
-
  wget_info () {
     echo """-r, —recursive（递归） specify recursive download.（指定递归下载）
 

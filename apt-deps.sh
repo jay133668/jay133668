@@ -6,6 +6,7 @@ get_all_depends()
         apt-cache depends --no-pre-depends --no-suggests --no-recommends --no-conflicts --no-breaks --no-enhances --no-replaces --recurse $1 | awk '{print $2}'| tr -d '<>' | sort --unique
 }
 
+apt-get download $1
 
 ## 遍历命令行参数，参数应为包名。
 for pkg in $*
