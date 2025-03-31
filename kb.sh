@@ -8,4 +8,5 @@ dpkg -l | grep ^rc | cut -d' ' -f3 | sudo xargs dpkg --purge
 #如何去除UNIX系統下文件中的换行符^M ：
 Linux: dos2unix filename
 Aix :cat filename | perl -pe '~s/\r//g' > filename
+cat file1 | tr -d "^V^M" > file2
 或者cat filename | tr -d "\r" > filename
