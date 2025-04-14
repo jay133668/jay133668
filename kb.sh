@@ -134,3 +134,40 @@ https://blog.csdn.net/thetender/article/details/139842127
 (第16课)Linux基础(shell脚本列表与数组)
 https://zhuanlan.zhihu.com/p/483399604
 ##########################################################################################################################################
+systemd自定义service报错Systemd start operation timed out. Terminating. 
+https://juejin.cn/post/7330079146515464231
+起因
+
+在/usr/lib/systemd/system/下定义了redisd.service
+
+[Unit]
+Description = Redis Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/root/tools/redis-7.0.5-binary/bin/redis-server /root/tools/redis-7.0.5-binary/config/redis.conf
+
+[Install]
+WantedBy=multi-user.target
+
+本来开心的执行systemctl start redisd，结果报错
+
+Systemd start operation timed out. Terminating.
+
+一番查找，有的说是要改成Type=forking，有的说是加TimeoutSec=30，结果没一个说到点子上
+结果
+
+最后找到原因，是systemd的参数解析问题，我们需要将启动命令封装成一个字符串，用bash -c的方式进行调用，正确格式如下
+
+[Unit]
+Description = Redis Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=bash -c "/root/tools/redis-7.0.5-binary/bin/redis-server /root/tools/redis-7.0.5-binary/config/redis.conf"
+
+[Install]
+WantedBy=multi-user.target
+##########################################################################################################################################
