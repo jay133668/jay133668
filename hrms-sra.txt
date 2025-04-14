@@ -1,0 +1,108 @@
+
+cp -p /etc/ssh/sshd_config /etc/ssh/sshd_config`date +%F`
+
+egrep -v "^$|^#" /etc/ssh/sshd_config | egrep -i 'PermitRootLogin|Port|PermitEmptyPasswords'
+
+#set 22222
+egrep -i 'Port' /etc/ssh/sshd_config
+#set no
+egrep -i PermitRootLogin /etc/ssh/sshd_config
+#set no
+egrep -i 'PermitEmptyPasswords' /etc/ssh/sshd_config
+
+unzip /tmp/rkhunter-deb.zip
+dpkg -iR /tmp/rkhunter-deb
+
+
+set sudo :
+sudo_line=`egrep -in "^%sudo" /etc/sudoers | awk -F ":" '{print $1}'`
+sed -i "${sudo_line}c%sudo   ALL=(ALL:ALL) NOPASSWD: ALL" /etc/sudoers 
+egrep -in "^%sudo" /etc/sudoers 
+
+
+
+win offline 安裝openssh server:
+https://github.com/PowerShell/Win32-OpenSSH/releases
+下載OpenSSH-Win64.zip解壓到C:\Program Files\OpenSSH\
+執行C:\Program Files\OpenSSH\install-ssh.ps1
+設置開機自啓:
+net start sshd
+sc config sshd start=auto
+sudo mount -t cifs -o username=samba,password=P@ssw0rd //10.26.177.137/hrms-samba /mnt/smb
+
+#################################################################################################
+#!/bin/bash
+ansible all -i host/hosts -m debug -a "var=ansible_hostname" > /tmp/phs
+egrep -i hqlv /tmp/phs | awk '{print $1}'  > /tmp/hs
+for i in `cat /tmp/hs`
+do
+ansible $i -i host/hosts -m shell -a " dpkg -l " > /tmp/full-dpkg.list
+chmod 777 /tmp/full-dpkg.list
+host=`sed -n 1p /tmp/full-dpkg.list | awk '{print $1}'`
+egrep -i "^ii" /tmp/full-dpkg.list | awk '{print $2,$3}' > /tmp/full-up/$i-full-dpkg.list
+chmod 777 /tmp/full-up/$i-full-dpkg.list
+done
+#################################################################################################
+diff:
+
+def_list=/tmp/full-up/hrnnhqlvem01-full-dpkg.list
+for i in `ls /tmp/full-up/ | egrep -iv lvem01`
+do
+	diff $def_list /tmp/full-up/$i >> /tmp/diff-list
+done
+
+
+#################################################################################################
+online:
+mkdir /tmp/full-up
+sudo chmod -R 775 /tmp/full-up
+sudo chown -R icadmin.icadmin /tmp/full-up
+
+offline:
+sudo dpkg -l | egrep -i "^ii" | awk '{print $2,$3}' > /tmp/`hostname`-full-dpkg.list
+sudo chmod 775 /tmp/`hostname`-full-dpkg.list
+sudo scp /tmp/`hostname`-full-dpkg.list ansible@10.26.177.137:/tmp/full-up
+
+for a in `ls /tmp/full-up` 
+do   
+	f_n=`echo $a | cut -d '-' -f1`
+	mkdir /var/cache/apt/archives/$f_n
+	while read i ;
+	do	
+		pn=`echo $i | awk '{print $1}'`
+		ver=`echo $i | awk '{print $2}'`
+		lat=`apt-cache policy $pn | egrep -i "Candidate" | awk '{print $2}'`
+		if [ $ver != $lat ] ; then
+			sudo apt-get -y install --reinstall --download-only $pn
+		fi
+	done < /tmp/full-up/$a
+mv /var/cache/apt/archives/*.deb /var/cache/apt/archives/$f_n
+chmod -R 777 /var/cache/apt/archives/$f_n
+done  
+
+######################################################################################
+ins_list=`/tmp/`hostname`-full-dpkg.list`
+pn=`echo $ins_list | awk '{print $1}'`
+ver=`echo $ins_list | awk '{print $2}'`
+dpkg -l $pn
+if [ $? == 0 ] ; then
+	deb=`ls /mnt/smb-client/`hostname`/$pn*`
+	dpkg -i $deb
+fi
+
+
+for i in `ls /mnt/smb-client/update-deb/`
+do
+	a=`echo $i | awk -F "_" '{print $1}'`
+	dpkg -l $a
+	if [ $? == 0 ] ; then
+		o_v=`hostnamectl  | egrep -i System | awk '{print $4}'`
+		dpkg -i /mnt/smb-client/hrvnhqlvwb01/$i
+		echo "$a $o_v" >> /tmp/test2.txt
+	fi
+done
+
+
+
+/usr/lib/python3/dist-packages/apt_offline_core/AptOfflineCoreLib.py
+/usr/lib/python3/dist-packages/apt_offline_core/AptOfflineLib.py
