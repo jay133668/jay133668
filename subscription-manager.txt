@@ -1,0 +1,23 @@
+2. 注册系统
+使用你的 Red Hat 订阅账号注册你的系统。你需要提供有效的用户名和密码。可以通过以下命令注册：
+sudo subscription-manager register --username YOUR_USERNAME --password YOUR_PASSWORD
+
+3. 激活订阅
+在注册后，你需要将你的系统连接到有效的订阅。首先，列出所有可用的订阅：
+subscription-manager list --available
+
+然后，使用订阅 ID 或订阅池 ID 激活订阅：
+sudo subscription-manager attach --auto
+或者指定订阅 ID：
+sudo subscription-manager attach --pool=POOL_ID
+
+訂閱highavailability （ansible相關工具）：
+subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
+
+OS:
+subscription-manager repos --enable=rhel-8-for-x86_64-appstream-rpms
+subscription-manager repos --enable=rhel-8-for-x86_64-baseos-rpms
+
+sync source on redhat:
+reposync --repoid=rhel-8-for-x86_64-baseos-rpms  -p /opt/rpm`date +%Y%m` --downloadcomps -n
+reposync --repoid=rhel-8-for-x86_64-appstream-rpms  -p /opt/rpm`date +%Y%m` --downloadcomps -n
