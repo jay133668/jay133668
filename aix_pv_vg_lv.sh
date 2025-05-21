@@ -67,7 +67,7 @@ empty_out () {
         exit 1
 }
 
-mp=$1
+export mp=$1
 mplv=`df -g $mp |awk '{print $1}' | sed -n 2p | awk -F '/' '{print $3}'`
 all_vg=`lspv | egrep "active|concurrent" |awk '{print $3}' | uniq`
 
@@ -76,8 +76,12 @@ all_vg=`lspv | egrep "active|concurrent" |awk '{print $3}' | uniq`
 for vg in $all_vg
 do
 vgstat=`lsvg $vg | egrep -i "total|free|used" | egrep -i pps`
-lsvg -l $vg | egrep -wi $mplv ; [ $? == 0 ] && echo -e "mount_point: $mp \nlv: $mplv \nvg: $vg \n$vgstat"
+vgmsg () {
+echo ; echo -e "mount_point: $mp \nlv: $mplv \nvg: $vg" ; echo ; echo -e "$vgstat"
+}
+lsvg -l $vg | egrep -wi $mplv ; [ $? == 0 ] && vgmsg
 done
+
 
 ##########################################
 
