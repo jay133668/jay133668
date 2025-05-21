@@ -75,7 +75,7 @@ all_vg=`lspv | egrep "active|concurrent" |awk '{print $3}' | uniq`
 
 for vg in $all_vg
 do
-vgstat=`lsvg rootvg | egrep -i "total|free|used" | egrep -i pps`
+vgstat=`lsvg $vg | egrep -i "total|free|used" | egrep -i pps`
 lsvg -l $vg | egrep -wi $mplv ; [ $? == 0 ] && echo -e "mount_point: $mp \nlv: $mplv \nvg: $vg \n$vgstat"
 done
 
