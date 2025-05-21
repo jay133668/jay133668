@@ -69,7 +69,7 @@ empty_out () {
 
 mp=$1
 mplv=`df -g $mp |awk '{print $1}' | sed -n 2p | awk -F '/' '{print $3}'`
-all_vg=`lspv | egrep active |awk '{print $3}' | uniq`
+all_vg=`lspv | egrep "active|concurrent" |awk '{print $3}' | uniq`
 
 [ -z $1 ] && empty_out
 
