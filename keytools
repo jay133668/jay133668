@@ -1,0 +1,35 @@
+#使用keytool导入证书‌
+#执行以下命令（需管理员权限）：
+参数说明‌：
+-alias：为证书指定唯一别名（如my_encrypt_cert）
+-file：待导入的证书文件路径
+-storepass：默认密码为changeit‌12
+#解决常见问题‌
+‌#证书不受信任‌：确认证书来源合法，或手动选择信任（输入y确认）‌
+#‌密码错误‌：若修改过默认密码，需使用自定义密码替代changeit
+keytool -import -alias 证书别名 -file 证书路径/证书文件.cer -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit
+keytool -import -alias gegdev.gets.hksarg -file ebms_2023.import.pem -keystore /etc/pki/ca-trust/extracted/java/cacerts -storepass changeit
+
+keytool -list -v -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit | grep "别名"
+keytool -list -v -keystore /etc/pki/ca-trust/extracted/java/cacerts -storepass changeit | grep gegdev.gets.hksarg
+
+#生成加密的cacerts文件（Java信任库）
+#1. ‌生成自签名CA根证书
+openssl genrsa -aes256 -out ca.key 2048 
+openssl req -x509 -new -key ca.key -days 3650 -out ca.crt -subj "/C=CN/ST=Beijing/L=Beijing/O=MyOrg/CN=MyCA" 
+#2. ‌将CA证书导入Java信任库（cacerts）‌
+#使用Java的keytool工具将CA证书添加到默认信任库： 
+keytool -import -trustcacerts -alias MyCA -file ca.crt -keystore cacerts -storepass changeit  
+#3. ‌验证信任库内容‌
+#检查cacerts中已导入的证书：
+keytool -list -keystore cacerts -storepass changeit  
+
+#若需为客户端/服务端生成证书并签名，可参考以下流程：
+#用CA私钥签署CSR请求：
+bash
+Copy Code
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -out server.crt  
+将服务端证书导入PKCS12格式密钥库：
+bash
+Copy Code
+openssl pkcs12 -export -in server.crt -inkey server.key -out server.p12
