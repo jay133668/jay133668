@@ -1,3 +1,28 @@
+#抓取证书并保存:
+echo | openssl s_client -servername {hostname} -connect ip:port 2>/dev/null | openssl x509 > s.crt
+openssl x509 -in s.crt -text -noout
+/opt/rsa/am/rsapgdata/server.crt
+#######################################################################################################################
+#尋找server 全部cert,save為列表:
+find / -name "*.crt" -o -name "*.pem" 2>/dev/null > `hostname`-cert.list
+# filter 出cert列表 Public-Key 是多少bit:
+for i in $(cat `hostname`-cert.list); do  echo -e  $i >> all_keysize.list ; openssl x509 -in $i -text -noout 2>/dev/null | egrep Public-Key >> all_keysize.list ; done
+#######################################################################################################################
+#scan port 用哪些 tls:
+nmap --script ssl-enum-ciphers -p 8443 `hostname -i` | grep TLSv1
+openssl s_client -connect $ip:$port -tls1_2
+
+#######################################################################################################################
+openssl ciphers -v 'HIGH:!aNULL:!eNULL:!SSLv2:!SSLv3:!TLSv1'
+‌命令分解‌：
+openssl ciphers -v：显示所有可用加密套件的详细信息
+'HIGH:!aNULL:!eNULL:!SSLv2:!SSLv3:!TLSv1'：筛选条件：
+HIGH：仅包含高强度加密套件
+!aNULL：排除匿名认证套件
+!eNULL：排除无加密套件
+!SSLv2/SSLv3/TLSv1：排除不安全的旧协议版本
+#######################################################################################################################
+
 #使用keytool导入证书‌
 #执行以下命令（需管理员权限）：
 参数说明‌：
