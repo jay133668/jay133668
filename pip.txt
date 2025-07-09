@@ -1,0 +1,21 @@
+
+#set env :
+apt -y install python3.12-venv
+python3 -m venv myenv
+source myenv/bin/activate
+
+# upgrade pip :
+pip --version
+python -m pip install --upgrade pip
+pip --version
+
+# Python解释器路径不一致‌
+(myenv) root@ub2404:~# which python
+/root/myenv/bin/python
+
+    终端执行 which python 和 pip show beautifulsoup4 确认路径一致
+    VSCode中按Ctrl+Shift+P → Python: Select Interpreter 切换正确路径‌
+    
+(myenv) root@ub2404:~# which python
+/root/myenv/bin/python
+
