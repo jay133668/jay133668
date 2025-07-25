@@ -1,0 +1,8 @@
+
+# VC 或 exsi 指派 新增 dvd rom 到 win 后， win識別為cd rom 的 解決方法
+
+1. Win + R 快捷鍵 輸入 devmgmt.msc 打開了 device manager
+
+2.展开“DVD/CD-ROM 驱动器”类别 > 右键点击目标驱动器（例如标注为CD的设备） > 选择“卸载设备”
+
+3. 右click > 'scan for hardware changes'
