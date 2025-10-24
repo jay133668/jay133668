@@ -37,6 +37,7 @@ keytool -import -alias gegdev.gets.hksarg -file ebms_2023.import.pem -keystore /
 
 keytool -list -v -keystore ${JAVA_HOME}/jre/lib/security/cacerts -storepass changeit | grep "别名"
 keytool -list -v -keystore /etc/pki/ca-trust/extracted/java/cacerts -storepass changeit | grep gegdev.gets.hksarg
+keytool -list -v -alias "gegdev.gets.hksarg" -keystore /etc/pki/ca-trust/extracted/java/cacerts -storepass changeit
 
 #生成加密的cacerts文件（Java信任库）
 #1. ‌生成自签名CA根证书
