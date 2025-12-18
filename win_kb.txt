@@ -6,3 +6,11 @@
 2.展开“DVD/CD-ROM 驱动器”类别 > 右键点击目标驱动器（例如标注为CD的设备） > 选择“卸载设备”
 
 3. 右click > 'scan for hardware changes'
+
+windows 用命令 以administrator 打開 文件:
+
+powershell:
+Start-Process notepad.exe "C:\Windows\System32\drivers\etc\hosts" -Verb RunAs
+
+cmd:
+runas /user:Administrator "notepad C:\Windows\System32\drivers\etc\hosts"
