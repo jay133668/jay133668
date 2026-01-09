@@ -344,6 +344,49 @@ chlv -L {new_folder} {lv}
 chlv -L /bk/d01/app/oracle bkorabinlv
 chlv -L /bk/oradata bkoradatalv
 
+hddd=hdisk23
+# 查看 ODM PVID数据  pvid： 00CBE200 96A8F09F 
+odmget -q "name=$hddd and attribute=pvid" CuAt | egrep value
+# 直接从磁盘物理读取 PVID
+lquerypv -h /dev/$hddd 80 10
+00000080   00CBE200 96A8F09F 00000000 00000000  |................|
+# 查看磁盘 VGDA 记录的 PVID
+readvgda $hddd | grep pv_id
+pv_id:          00cbe20096a8f09f
+
+lqueryvg -Ptp $hddd
+Physical:       00cbe20096a8f09f                2   0
+
+#同步VGDA 的 pvid 到 ODM： 如果物理磁盘上有 PVID 但 ODM 缺失（显示为 none），可运行以下命令强制 ODM 重新读取磁盘：
+chdev -l $hddd -a pv=yes
+
+# 处理 PVID 改变：如前所述，若 PVID 已变且与 VGDA 不符，请直接使用 recreatevg 而非 importvg
+hddd=hdisk10
+odmget -q "name=$hddd and attribute=pvid" CuAt | egrep value
+readvgda $hddd | grep pv_id
+lqueryvg -Ptp $hddd
+lquerypv -h /dev/$hddd 80 10
+#######################################################################################################
+#同步VGDA 的 pvid 到 ODM script:
+for i in {hdisk10,hdisk13}
+do
+	old_pvid=`lspv | egrep $i | awk '{print $2}'`
+	new_pvid=$(readvgda $i | grep pv_id | awk '{print $2}')
+	odmget -q "name=$i and attribute=pvid" CuAt > /script/system/snapshot/odm/${i}CuAt_backup.txt
+	odmget -q "name=hdisk10 and attribute=pvid" CuAt | sed "s/$old_pvid/$new_pvid/" > /script/system/snapshot/odm/${i}CuAt_new.txt
+	odmchange -o CuAt -q "name=$i and attribute=pvid" /script/system/snapshot/odm/${i}CuAt_new.txt
+done
+
+#######################################################################################################
+# power ha manage vg error：
+root@pdcebkdb01(/script/system/snapshot)# lspv
+hdisk2          00f87d7a4fe73cd8                    oravg           concurrent
+hdisk6          00f87d7a4fe73cd8                    oravg           concurrent
+
+chdev -l hdisk2 -a pv=clear
+
+hdisk2          none                                None
+recreatevg -y bkoravg -Y bk -L /bk -O hdisk2
 
 ########################################################################################################################################################
 
