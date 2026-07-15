@@ -14,3 +14,23 @@ Start-Process notepad.exe "C:\Windows\System32\drivers\etc\hosts" -Verb RunAs
 
 cmd:
 runas /user:Administrator "notepad C:\Windows\System32\drivers\etc\hosts"
+
+
+#####################################################################################################
+#同步目錄，新增file，不del 已經更改文件
+@echo off
+set SOURCE="\\VLCHKG30920YLC0\source\N"
+set TARGET="C:\Users\Admin\Documents\N"
+
+rem /XC /XN /XO 組合可以完美做到：略過所有已存在的文件，只複製全新文件
+robocopy %SOURCE% %TARGET% /E /XC /XN /XO /FFT /R:3 /W:5 /Z /MT:8 /XD "System Volume Information" /XF "desktop.ini"
+####################################################################################################
+
+#完全同步 目錄一模一樣
+@echo off
+rem 1. 設定正確的來源與目標（目標尾部必須帶 \N，確保獨立隔離）
+set SOURCE="\\VLCHKG30920YLC0\source\N"
+set TARGET="C:\Users\Admin\Documents\N"
+
+rem 2. 使用 /PURGE 參數：同步新增的同時，刪除本地已改名或遠端已不存在的檔案
+robocopy %SOURCE% %TARGET% /E /PURGE /FFT /R:3 /W:5 /Z /MT:8 /XD "System Volume Information" /XF "desktop.ini"
